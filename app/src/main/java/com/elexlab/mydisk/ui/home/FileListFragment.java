@@ -9,24 +9,27 @@ import android.widget.ListView;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.elexlab.mydisk.R;
 import com.elexlab.mydisk.constants.Constants;
 import com.elexlab.mydisk.datasource.DataSourceCallback;
 import com.elexlab.mydisk.datasource.DiskFileLoader;
 import com.elexlab.mydisk.pojo.FileInfo;
+import com.elexlab.mydisk.ui.files.FilesBrowserAdapter;
 import com.elexlab.mydisk.utils.CommonUtil;
 
 import java.util.List;
 
 public class FileListFragment  extends Fragment {
 
-    private static int viewMode = 1;
+    private int viewMode = 1;
     private HomeViewModel homeViewModel;
     private String dir = "";
 
     private DiskFileLoader diskFileLoader;
-    private FilesAdapter filesAdapter;
+    private FilesBrowserAdapter filesBrowserAdapter;
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         homeViewModel =
@@ -41,8 +44,9 @@ public class FileListFragment  extends Fragment {
             }
         });
 
+        final RecyclerView rcvFiles = root.findViewById(R.id.rcvFiles);
+        rcvFiles.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        final ListView lvFiles = root.findViewById(R.id.lvFiles);
         dir = "";
         if (getArguments() != null) {
             String currentDir = getArguments().getString("dir");
@@ -51,42 +55,32 @@ public class FileListFragment  extends Fragment {
             }
         }
         final String path = dir;
-        diskFileLoader = new DiskFileLoader();
-        filesAdapter = new FilesAdapter(this);
-        lvFiles.setAdapter(filesAdapter);
+        diskFileLoader = new DiskFileLoader(dir);
+        filesBrowserAdapter = new FilesBrowserAdapter(this);
+        rcvFiles.setAdapter(filesBrowserAdapter);
         switchModel();
         return root;
     }
 
     public void switchModel(){
-        if(viewMode == 0){
-            diskFileLoader.loadLocalFiles(dir, new DataSourceCallback<List<FileInfo>>() {
-                @Override
-                public void onSuccess(List<FileInfo> fileInfos, String... extraParams) {
-                    filesAdapter.reset(fileInfos);
+        diskFileLoader.loadFiles(dir, new DiskFileLoader.Callback() {
+            @Override
+            public void onLoaded(List<FileInfo> merged, List<FileInfo> locals, List<FileInfo> mirrors) {
+                switch (viewMode){
+                    case 0:{
+                        filesBrowserAdapter.resetFileList(merged);
+                        viewMode = 1;
+                        break;
+                    }
+                    case 1:{
+                        filesBrowserAdapter.resetFileList(locals);
+                        viewMode = 0;
+                        break;
+                    }
                 }
+            }
+        });
 
-                @Override
-                public void onFailure(String errMsg, int code) {
-
-                }
-            });
-            viewMode = 1;
-        }else if(viewMode == 1){
-            diskFileLoader.loadMergedFiles(dir, new DataSourceCallback<List<FileInfo>>() {
-                @Override
-                public void onSuccess(List<FileInfo> fileInfos, String... extraParams) {
-                    filesAdapter.reset(fileInfos);
-                }
-
-                @Override
-                public void onFailure(String errMsg, int code) {
-
-                }
-            });
-            viewMode = 0;
-
-        }
 
     }
 

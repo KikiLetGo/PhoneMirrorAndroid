@@ -66,6 +66,10 @@ public class FileInfo extends HttpPojo{
         return FileType.DOCUMENT.equals(fileType);
     }
 
+    public String getLocalPath(){
+        return Constants.Path.LOCAL_DISK_ROOT+path;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if(obj == null||!(obj instanceof FileInfo)){
@@ -74,5 +78,6 @@ public class FileInfo extends HttpPojo{
         FileInfo outter = (FileInfo) obj;
         return (path+name).equals(outter.path+outter.name);
     }
+
 
 }

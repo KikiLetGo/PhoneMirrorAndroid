@@ -16,29 +16,38 @@ public class DiskFileLoader {
     private List<FileInfo> localCaches;
     private List<FileInfo> mirrorCaches;
     private List<FileInfo> mergedCaches;
-    public void loadMergedFiles(final String dir,final DataSourceCallback<List<FileInfo>> callback){
-        if(mergedCaches != null){
+    private String dir;
+
+    public interface Callback{
+        void onLoaded(List<FileInfo> merged,List<FileInfo> locals,List<FileInfo> mirrors);
+    }
+    public DiskFileLoader(String dir) {
+        this.dir = dir;
+    }
+
+    public void loadFiles(final String dir, final Callback callback){
+        if(mergedCaches != null && localCaches != null && mirrorCaches != null){
             if(callback != null){
-                callback.onSuccess(mergedCaches);
-                return;
+                callback.onLoaded(mergedCaches,localCaches,mirrorCaches);
             }
+            return;
         }
         if(mirrorCaches != null && localCaches != null){
             mergedCaches = mergeLocalAndMirrorFile(localCaches,mirrorCaches);
             if(callback != null){
-                callback.onSuccess(mergedCaches);
-                return;
+                callback.onLoaded(mergedCaches,localCaches,mirrorCaches);
             }
+            return;
         }
-        loadLocalFiles(dir, new DataSourceCallback<List<FileInfo>>() {
+        loadLocalFiles(new DataSourceCallback<List<FileInfo>>() {
             @Override
             public void onSuccess(final List<FileInfo> localFileInfos, String... extraParams) {
-                loadMirrorFiles(dir, new DataSourceCallback<List<FileInfo>>() {
+                loadMirrorFiles(new DataSourceCallback<List<FileInfo>>() {
                     @Override
                     public void onSuccess(List<FileInfo> fileInfos, String... extraParams) {
-                        List<FileInfo> allFileInfos = mergeLocalAndMirrorFile(localFileInfos,fileInfos);
+                        mergeLocalAndMirrorFile(localFileInfos,fileInfos);
                         if(callback != null){
-                            callback.onSuccess(allFileInfos);
+                            callback.onLoaded(mergedCaches,localCaches,mirrorCaches);
                         }
                     }
 
@@ -64,8 +73,9 @@ public class DiskFileLoader {
             FileInfo result = null;
             for(FileInfo mirrorFileInfo:mirrorFileInfos){
                 if(localFileInfo.equals(mirrorFileInfo)){
-                    result = mirrorFileInfo;
-                    result.setStoreLocation(FileInfo.StoreLocation.LOCAL_MIRROR);
+                    localFileInfo.setStoreLocation(FileInfo.StoreLocation.LOCAL_MIRROR);
+                    mirrorFileInfo.setStoreLocation(FileInfo.StoreLocation.LOCAL_MIRROR);
+                    result = localFileInfo;
                     break;
                 }
             }
@@ -85,7 +95,7 @@ public class DiskFileLoader {
         mergedCaches = mergedList;
         return mergedList;
     }
-    public void loadLocalFiles(String dir,final DataSourceCallback<List<FileInfo>> callback){
+    private void loadLocalFiles(final DataSourceCallback<List<FileInfo>> callback){
         if(localCaches != null){
             if(callback != null){
                 callback.onSuccess(localCaches);
@@ -111,7 +121,7 @@ public class DiskFileLoader {
         }, dataCondition,FileInfo.class);
     }
 
-    public void loadMirrorFiles(String dir,final DataSourceCallback<List<FileInfo>> callback){
+    private void loadMirrorFiles(final DataSourceCallback<List<FileInfo>> callback){
         if(mirrorCaches != null){
             if(callback != null){
                 callback.onSuccess(localCaches);

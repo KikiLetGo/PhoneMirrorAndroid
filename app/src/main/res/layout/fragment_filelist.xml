@@ -26,10 +26,15 @@
                     android:layout_height="wrap_content"/>
             </LinearLayout>
         </RelativeLayout>
-        <ListView
-            android:id="@+id/lvFiles"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rcvFiles"
+            android:clipToPadding="false"
+            android:background="#ffffff"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent">
+
+        </androidx.recyclerview.widget.RecyclerView>
+
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
