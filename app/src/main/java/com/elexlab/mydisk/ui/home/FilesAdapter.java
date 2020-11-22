@@ -150,7 +150,7 @@ public class FilesAdapter extends BaseAdapter {
                     String dir = fileInfo.getPath()+"/"+fileInfo.getName();
                     args.putString("dir", dir);
                     fileListFragment.setArguments(args);
-                    FragmentUtils.switchFragment(fragment.getActivity(),R.id.flContainer,fragment,fileListFragment);
+                    FragmentUtils.switchFragment(fragment.getActivity(),R.id.flContainer,fragment,fileListFragment,true);
                 }else{
                     if(FileInfo.StoreLocation.LOCAL == fileInfo.getStoreLocation()||
                             FileInfo.StoreLocation.LOCAL_MIRROR == fileInfo.getStoreLocation()

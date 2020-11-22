@@ -24,7 +24,7 @@ public class FileBrowserActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_files_browser);
         final FileListFragment fileListFragment = new FileListFragment();
-        FragmentUtils.switchFragment(this,R.id.flContainer,null,fileListFragment);
+        FragmentUtils.switchFragment(this,R.id.flContainer,null,fileListFragment,false);
 
 
     }

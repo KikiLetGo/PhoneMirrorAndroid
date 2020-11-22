@@ -11,7 +11,7 @@ import androidx.fragment.app.FragmentTransaction;
  */
 public class FragmentUtils {
 
-    public static Fragment switchFragment(FragmentActivity fragmentActivity, int resId, Fragment from, Fragment to) {
+    public static Fragment switchFragment(FragmentActivity fragmentActivity, int resId, Fragment from, Fragment to,boolean addToBack) {
 
         FragmentTransaction transaction = fragmentActivity.getSupportFragmentManager().beginTransaction();
         if(from != null){
@@ -20,9 +20,12 @@ public class FragmentUtils {
         if (!to.isAdded()) {    // 先判断是否被add过
 
             transaction
-                    .add(resId, to)
-                    .addToBackStack(null)
-                    .commit(); // 隐藏当前的fragment，add下一个到Activity中
+                    .add(resId, to);
+
+            if(addToBack){
+                transaction.addToBackStack(null);
+            }
+            transaction.commit();
         } else {
 
             transaction.show(to).commit(); // 隐藏当前的fragment，显示下一个
