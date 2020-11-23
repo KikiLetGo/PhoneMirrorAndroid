@@ -21,7 +21,8 @@
                 android:layout_width="100dp"
                 android:layout_height="match_parent">
                 <ImageView
-                    android:src="@drawable/ic_eye"
+                    android:id="@+id/ivMode"
+                    android:src="@mipmap/ic_eye_close"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"/>
             </LinearLayout>

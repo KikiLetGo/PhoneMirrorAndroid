@@ -1,21 +1,21 @@
 package com.elexlab.mydisk.ui.files;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -24,7 +24,6 @@ import com.elexlab.mydisk.constants.Constants;
 import com.elexlab.mydisk.manager.FileSystemManager;
 import com.elexlab.mydisk.pojo.FileInfo;
 import com.elexlab.mydisk.ui.home.FileListFragment;
-import com.elexlab.mydisk.ui.home.FilesAdapter;
 import com.elexlab.mydisk.ui.misc.RecyclerItemData;
 import com.elexlab.mydisk.utils.DownloadTools;
 import com.elexlab.mydisk.utils.FileOpenUtils;
@@ -113,6 +112,12 @@ public class FilesBrowserAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                         false));
                 return viewHolder;
             }
+            case FileInfo.StoreLocation.LOCAL_MIRROR_RECOVERY:{
+                ViewHolder viewHolder = new ViewHolder(LayoutInflater.from(
+                        context).inflate(R.layout.item_file_recovery, parent,
+                        false));
+                return viewHolder;
+            }
             default:{
                 ViewHolder viewHolder = new ViewHolder(LayoutInflater.from(
                         context).inflate(R.layout.item_file, parent,
@@ -156,7 +161,8 @@ public class FilesBrowserAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         }
 
 
-        if(getItemViewType(position) == FileInfo.StoreLocation.LOCAL_MIRROR){
+        if(getItemViewType(position) == FileInfo.StoreLocation.LOCAL_MIRROR||
+                getItemViewType(position) == FileInfo.StoreLocation.LOCAL_MIRROR_RECOVERY){
             onClickListener = new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -181,7 +187,7 @@ public class FilesBrowserAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                             handler.post(new Runnable() {
                                 @Override
                                 public void run() {
-                                    fileInfo.setStoreLocation(FileInfo.StoreLocation.LOCAL_MIRROR);
+                                    fileInfo.setStoreLocation(FileInfo.StoreLocation.LOCAL_MIRROR_RECOVERY);
                                     notifyItemChanged(position);
                                     //FileOpenUtils.openFile(context,path);
                                 }
@@ -197,17 +203,21 @@ public class FilesBrowserAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             };
 
         }else if(getItemViewType(position) == FileInfo.StoreLocation.LOCAL){
-            LocalViewHolder localViewHolder = (LocalViewHolder) holder;
-            localViewHolder.ivLocation.setImageResource(R.drawable.ic_sync);
+            final LocalViewHolder localViewHolder = (LocalViewHolder) holder;
             localViewHolder.ivLocation.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(final View v) {
+                    final Animation operatingAnim = AnimationUtils.loadAnimation(context, R.anim.rotate_anim);
+                    LinearInterpolator lin = new LinearInterpolator();
+                    operatingAnim.setInterpolator(lin);
+                    localViewHolder.ivLocation.startAnimation(operatingAnim);
                     FileSystemManager.getInstance().uploadFile(fileInfo.getPath()+fileInfo.getName(),fileInfo.getUrl(), new FileSystemManager.FileActionListener() {
                         @Override
                         public void onCompletion(String msg) {
                             handler.post(new Runnable() {
                                 @Override
                                 public void run() {
+                                    localViewHolder.ivLocation.clearAnimation();
                                     fileInfo.setStoreLocation(FileInfo.StoreLocation.LOCAL_MIRROR);
                                     notifyItemChanged(position);
                                 }
@@ -246,6 +256,15 @@ public class FilesBrowserAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
         }
         viewHolder.itemView.setOnClickListener(onClickListener);
+        if(getItemViewType(position) == FileInfo.StoreLocation.LOCAL_MIRROR_RECOVERY){
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    fileInfo.setStoreLocation(FileInfo.StoreLocation.LOCAL_MIRROR);
+                    notifyItemChanged(position);
+                }
+            },1500);
+        }
     }
 
 

@@ -11,6 +11,7 @@ public class FileInfo extends HttpPojo{
         int MIRROR = 0;
         int LOCAL = MIRROR+1;
         int LOCAL_MIRROR = LOCAL+1;
+        int LOCAL_MIRROR_RECOVERY = LOCAL_MIRROR+1;
     }
     private String fileType;
     private String name;

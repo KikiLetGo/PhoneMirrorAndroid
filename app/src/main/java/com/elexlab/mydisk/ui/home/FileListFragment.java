@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.ListView;
 
 import androidx.annotation.NonNull;
@@ -23,13 +24,18 @@ import com.elexlab.mydisk.utils.CommonUtil;
 import java.util.List;
 
 public class FileListFragment  extends Fragment {
+    private interface ShowMode{
+        int NO_MIRROR = 0;
+        int WITH_MIRROR = 1;
+    }
 
-    private int viewMode = 1;
+    private int viewMode = ShowMode.NO_MIRROR;
     private HomeViewModel homeViewModel;
     private String dir = "";
 
     private DiskFileLoader diskFileLoader;
     private FilesBrowserAdapter filesBrowserAdapter;
+    private ImageView ivMode;
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         homeViewModel =
@@ -37,6 +43,7 @@ public class FileListFragment  extends Fragment {
         View root = inflater.inflate(R.layout.fragment_filelist, container, false);
 
         View llShowMirror = root.findViewById(R.id.llShowMirror);
+        ivMode = root.findViewById(R.id.ivMode);
         llShowMirror.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -58,31 +65,42 @@ public class FileListFragment  extends Fragment {
         diskFileLoader = new DiskFileLoader(dir);
         filesBrowserAdapter = new FilesBrowserAdapter(this);
         rcvFiles.setAdapter(filesBrowserAdapter);
-        switchModel();
+        loadFiles();
         return root;
     }
-
     public void switchModel(){
+        if(viewMode == ShowMode.WITH_MIRROR){
+            viewMode = ShowMode.NO_MIRROR;
+            ivMode.setImageResource(R.mipmap.ic_eye_close);
+
+        }else if(viewMode == ShowMode.NO_MIRROR){
+            viewMode = ShowMode.WITH_MIRROR;
+            ivMode.setImageResource(R.drawable.ic_eye);
+        }
+
+        loadFiles();
+    }
+
+    private void loadFiles(){
         diskFileLoader.loadFiles(dir, new DiskFileLoader.Callback() {
             @Override
             public void onLoaded(List<FileInfo> merged, List<FileInfo> locals, List<FileInfo> mirrors) {
+
                 switch (viewMode){
-                    case 0:{
+                    case ShowMode.WITH_MIRROR:{
                         filesBrowserAdapter.resetFileList(merged);
-                        viewMode = 1;
                         break;
                     }
-                    case 1:{
+                    case ShowMode.NO_MIRROR:{
                         filesBrowserAdapter.resetFileList(locals);
-                        viewMode = 0;
                         break;
                     }
                 }
             }
         });
-
-
     }
+
+
 
 
 }
