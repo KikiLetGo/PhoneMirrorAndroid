@@ -12,7 +12,9 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.animation.LinearInterpolator;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -171,15 +173,17 @@ public class FilesBrowserAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 }
             };
         }else if(getItemViewType(position) == FileInfo.StoreLocation.MIRROR){
-            MirrorViewHolder mirrorViewHolder = (MirrorViewHolder) holder;
+            final MirrorViewHolder mirrorViewHolder = (MirrorViewHolder) holder;
 
             onClickListener = new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    mirrorViewHolder.pbRecovering.setVisibility(View.VISIBLE);
                     String url = Constants.DOWNLOAD_FILE + fileInfo.getPath()+fileInfo.getName()+"&filename="+fileInfo.getName();
                     final String path = fileInfo.getLocalPath()+"/"+fileInfo.getName();
                     HeroLog.d("FilesAdapter",path);
                     HeroLog.d("url",url);
+
 
                     DownloadTools.DownloadFile(url, path, new DownloadTools.DownLoadCallback() {
                         @Override
@@ -187,6 +191,7 @@ public class FilesBrowserAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                             handler.post(new Runnable() {
                                 @Override
                                 public void run() {
+                                    mirrorViewHolder.pbRecovering.setVisibility(View.INVISIBLE);
                                     fileInfo.setStoreLocation(FileInfo.StoreLocation.LOCAL_MIRROR_RECOVERY);
                                     notifyItemChanged(position);
                                     //FileOpenUtils.openFile(context,path);
@@ -211,9 +216,9 @@ public class FilesBrowserAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                     LinearInterpolator lin = new LinearInterpolator();
                     operatingAnim.setInterpolator(lin);
                     localViewHolder.ivLocation.startAnimation(operatingAnim);
-                    FileSystemManager.getInstance().uploadFile(fileInfo.getPath()+fileInfo.getName(),fileInfo.getUrl(), new FileSystemManager.FileActionListener() {
+                    FileSystemManager.getInstance().uploadFile(fileInfo, new FileSystemManager.FileActionListener() {
                         @Override
-                        public void onCompletion(String msg) {
+                        public void onCompletion(final FileInfo fileInfo,String msg) {
                             handler.post(new Runnable() {
                                 @Override
                                 public void run() {
@@ -226,8 +231,15 @@ public class FilesBrowserAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                         }
 
                         @Override
-                        public void onError(String msg) {
+                        public void onError(FileInfo fileInfo,final String msg) {
+                            handler.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    localViewHolder.ivLocation.clearAnimation();
+                                    Toast.makeText(fragment.getContext(),"同步发生错误:"+msg,Toast.LENGTH_LONG).show();
 
+                                }
+                            });
                         }
                     });
                 }
@@ -298,12 +310,15 @@ public class FilesBrowserAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     }
     private class MirrorViewHolder extends ViewHolder{
 
+        public ProgressBar pbRecovering;
 
         public MirrorViewHolder(@NonNull View itemView) {
             super(itemView);
             ColorMatrix cm = new ColorMatrix();
             cm.setSaturation(0.1f);
             ivIcon.setColorFilter(new ColorMatrixColorFilter(cm));
+            pbRecovering = itemView.findViewById(R.id.pbRecovering);
+
         }
     }
     private class LocalViewHolder extends ViewHolder{

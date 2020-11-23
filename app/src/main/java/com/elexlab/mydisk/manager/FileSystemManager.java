@@ -8,6 +8,7 @@ import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.elexlab.mydisk.constants.Constants;
 import com.elexlab.mydisk.datasource.HeroLib;
 import com.elexlab.mydisk.model.FileDir;
+import com.elexlab.mydisk.pojo.FileInfo;
 import com.elexlab.mydisk.utils.CommonUtil;
 import com.elexlab.mydisk.utils.HeroLog;
 import com.elexlab.mydisk.utils.HttpUtils;
@@ -38,8 +39,8 @@ public class FileSystemManager {
     }
 
     public interface FileActionListener{
-        void onCompletion(String msg);
-        void onError(String msg);
+        void onCompletion(FileInfo fileInfo,String msg);
+        void onError(FileInfo fileInfo,String msg);
     }
 
     public void checkAndCreateMirrorDisk(Context context){
@@ -61,9 +62,9 @@ public class FileSystemManager {
             }
         });
     }
-    public void uploadFile(String path,String localPath,final FileActionListener listener){
-        File file = new File(localPath);
-
+    public void uploadFile(final FileInfo fileInfo,final FileActionListener listener){
+        File file = new File(fileInfo.getUrl());//local file absolute url
+        String path = fileInfo.getPath()+fileInfo.getName();
 
 
         OkHttpClient client = new OkHttpClient();
@@ -71,8 +72,7 @@ public class FileSystemManager {
 
         RequestBody body = new MultipartBody.Builder()
                 .setType(MultipartBody.FORM)
-                .addFormDataPart("file", path,
-                        RequestBody.create(MediaType.parse("multipart/form-data"), new File(localPath)))
+                .addFormDataPart("file", path, RequestBody.create(MediaType.parse("multipart/form-data"), file))
                 .build();
 
 
@@ -90,13 +90,14 @@ public class FileSystemManager {
                 if (response.isSuccessful()) {
                     String res= response.body().string();
                     HeroLog.i(TAG, "onResponse: " +res);
+                    fileInfo.setStoreLocation(FileInfo.StoreLocation.LOCAL_MIRROR);
                     if(listener != null){
-                        listener.onCompletion(res);
+                        listener.onCompletion(fileInfo,res);
                     }
                 } else {
                     HeroLog.i(TAG,  "onResponse: " + response.message());
                     if(listener != null){
-                        listener.onError(response.body().string());
+                        listener.onError(fileInfo,response.body().string());
                     }
                 }
             }
@@ -105,6 +106,9 @@ public class FileSystemManager {
             public void onFailure(Call call, IOException e) {
                 // 文件上传失败
                 HeroLog.i(TAG,  "onFailure: " + e.getMessage());
+                if(listener != null){
+                    listener.onError(fileInfo,e.getMessage());
+                }
             }
         });
     }

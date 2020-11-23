@@ -3,13 +3,16 @@ package com.elexlab.mydisk.datasource;
 import android.util.ArraySet;
 
 import com.elexlab.mydisk.constants.Constants;
+import com.elexlab.mydisk.manager.FileSystemManager;
 import com.elexlab.mydisk.pojo.FileInfo;
+import com.elexlab.mydisk.ui.misc.ProgressListener;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 
 public class DiskFileLoader {
@@ -94,6 +97,58 @@ public class DiskFileLoader {
         sortFileInfos(mergedList);
         mergedCaches = mergedList;
         return mergedList;
+    }
+    public void syncDir2Mirror(final ProgressListener<FileInfo> progressListener){
+        loadFiles(dir,new DiskFileLoader.Callback(){
+
+            @Override
+            public void onLoaded(final List<FileInfo> merged, final List<FileInfo> locals, final List<FileInfo> mirrors) {
+                List<FileInfo> localFileInfos = new ArrayList<>();
+                for(FileInfo fileInfo:merged){
+                    if(fileInfo.getStoreLocation() == FileInfo.StoreLocation.LOCAL){
+                        localFileInfos.add(fileInfo);
+                    }
+                }
+                final Iterator<FileInfo> fileInfoIterator = localFileInfos.iterator();
+                final int allCount = localFileInfos.size();
+                if(fileInfoIterator.hasNext()){
+                    FileInfo fileInfo = fileInfoIterator.next();
+
+                    FileSystemManager.getInstance().uploadFile(fileInfo, new FileSystemManager.FileActionListener() {
+                        private int nowCount = 0;
+                        @Override
+                        public void onCompletion(FileInfo uploadedFileInfo,String msg) {
+                            nowCount = nowCount+1;
+                            float progress = ((float)nowCount)/((float)allCount);
+                            if(progressListener != null){
+                                progressListener.onProgress(progress,uploadedFileInfo);
+                            }
+                            if(fileInfoIterator.hasNext()){
+                                FileInfo fileInfo = fileInfoIterator.next();
+                                FileSystemManager.getInstance().uploadFile(fileInfo,this);
+                            }else{
+                                if(progressListener != null){
+                                    progressListener.onComplete();
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onError(FileInfo fileInfo,String msg) {
+                            if(progressListener != null){
+                                progressListener.onError(0,msg);
+                            }
+                        }
+                    });
+
+                }else{
+                    if(progressListener != null){
+                        progressListener.onComplete();
+                    }
+                }
+
+             }
+        });
     }
     private void loadLocalFiles(final DataSourceCallback<List<FileInfo>> callback){
         if(localCaches != null){

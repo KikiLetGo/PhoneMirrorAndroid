@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 
@@ -111,15 +112,16 @@ public class FilesAdapter extends BaseAdapter {
                 viewHolder.ivLocation.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        FileSystemManager.getInstance().uploadFile(fileInfo.getPath()+fileInfo.getName(),fileInfo.getUrl(), new FileSystemManager.FileActionListener() {
+                        FileSystemManager.getInstance().uploadFile(fileInfo, new FileSystemManager.FileActionListener() {
                             @Override
-                            public void onCompletion(String msg) {
+                            public void onCompletion(FileInfo fileInfo,String msg) {
                                 finalViewHolder.ivLocation.setImageResource(R.drawable.ic_done);
 
                             }
 
                             @Override
-                            public void onError(String msg) {
+                            public void onError(FileInfo fileInfo,String msg) {
+                                Toast.makeText(fragment.getContext(),"同步发生错误:"+msg,Toast.LENGTH_LONG).show();
 
                             }
                         });
