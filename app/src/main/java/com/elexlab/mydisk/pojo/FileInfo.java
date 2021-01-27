@@ -69,13 +69,15 @@ public class FileInfo extends HttpPojo{
     }
 
     public String getPath(){
-        if(storeLocation == StoreLocation.MIRROR){
-            String url = Constants.DOWNLOAD_FILE +dir+name;
-            return url;
 
-        }else {
-            return dir+File.separator+name;
-        }
+        return dir+File.separator+name;
+
+    }
+
+    public String getUrl(){
+        String url = Constants.DOWNLOAD_FILE +getDir()+"/&filename="+name;
+        return url;
+
     }
 
     public boolean isDir(){
@@ -93,7 +95,7 @@ public class FileInfo extends HttpPojo{
             return super.equals(obj);
         }
         FileInfo outter = (FileInfo) obj;
-        return (dir+name).equals(outter.dir+outter.name);
+        return getPath().equals(outter.getPath());
     }
 
 

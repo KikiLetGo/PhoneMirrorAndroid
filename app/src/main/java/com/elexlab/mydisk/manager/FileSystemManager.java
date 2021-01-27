@@ -129,7 +129,7 @@ public class FileSystemManager {
     }
     public void uploadFile(final FileInfo fileInfo,final FileActionListener listener){
         File file = new File(fileInfo.getPath());//local file absolute url
-        String path = fileInfo.getPath()+fileInfo.getName();
+        String path = fileInfo.getPath();
 
 
         OkHttpClient client = new OkHttpClient();
@@ -200,6 +200,7 @@ public class FileSystemManager {
                 }
                 Map<String,String> form = new HashMap<>();
                 form.put("fileDir",allFileJson);
+                form.put("externalStorageDirectory",path);
                 form.put("deviceId",CommonUtil.getDeviceId(HeroLib.getInstance().appContext));
                 HttpUtils.POST(Constants.HOST + "/createMirrorDisk", form, new HttpUtils.HttpRequestListener() {
                     @Override
@@ -230,10 +231,10 @@ public class FileSystemManager {
                 continue;
             }
             if(file.isDirectory()){
-                FileDir sunFileDir = new FileDir();
-                sunFileDir.setName(file.getName());
-                deepSearchFiles(file.getAbsolutePath(),sunFileDir);
-                fileDirs.add(sunFileDir);
+                FileDir sonFileDir = new FileDir();
+                sonFileDir.setName(file.getName());
+                deepSearchFiles(file.getAbsolutePath(),sonFileDir);
+                fileDirs.add(sonFileDir);
             }else{
                 documents.add(file.getName());
             }

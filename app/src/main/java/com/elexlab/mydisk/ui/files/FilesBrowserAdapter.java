@@ -179,7 +179,7 @@ public class FilesBrowserAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 @Override
                 public void onClick(View v) {
                     mirrorViewHolder.pbRecovering.setVisibility(View.VISIBLE);
-                    String url = Constants.DOWNLOAD_FILE + fileInfo.getPath()+fileInfo.getName()+"&filename="+fileInfo.getName();
+                    String url = fileInfo.getUrl();//Constants.DOWNLOAD_FILE + fileInfo.getPath()+fileInfo.getName()+"&filename="+fileInfo.getName();
                     final String path = fileInfo.getPath();
                     HeroLog.d("FilesAdapter",path);
                     HeroLog.d("url",url);
