@@ -50,7 +50,7 @@ public class LocalFileDataSource extends AsyncDataSource<FileInfo> {
     @Override
     public void getDatas(DataSourceCallback<List<FileInfo>> dataSourceCallback, DataCondition dataCondition, Class<FileInfo> clazz) {
         String dir = (String) dataCondition.getParamMap().get("dir");
-        File file = new File(Constants.Path.LOCAL_DISK_ROOT+dir);
+        File file = new File(dir);
         List<FileInfo> fileInfos = new ArrayList<>();
 
         for(File f:file.listFiles()){
@@ -60,7 +60,7 @@ public class LocalFileDataSource extends AsyncDataSource<FileInfo> {
             FileInfo fileInfo = new FileInfo();
 
             fileInfo.setName(f.getName());
-            fileInfo.setPath(dir+"/");
+            fileInfo.setDir(dir);
             fileInfo.setStoreLocation(FileInfo.StoreLocation.LOCAL);
             if(f.isDirectory()){
                 fileInfo.setFileType(FileInfo.FileType.DIR);

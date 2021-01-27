@@ -40,7 +40,7 @@ public class FileListFragment  extends Fragment {
 
     private int viewMode = ShowMode.NO_MIRROR;
     private HomeViewModel homeViewModel;
-    private String dir = "";
+    private String dir = Constants.Path.LOCAL_DISK_ROOT;
 
     private DiskFileLoader diskFileLoader;
     private FilesBrowserAdapter filesBrowserAdapter;
@@ -64,14 +64,12 @@ public class FileListFragment  extends Fragment {
         final RecyclerView rcvFiles = root.findViewById(R.id.rcvFiles);
         rcvFiles.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        dir = "";
         if (getArguments() != null) {
             String currentDir = getArguments().getString("dir");
             if(currentDir != null){
                 dir = currentDir;
             }
         }
-        final String path = dir;
         diskFileLoader = new DiskFileLoader(dir);
         filesBrowserAdapter = new FilesBrowserAdapter(this);
         rcvFiles.setAdapter(filesBrowserAdapter);

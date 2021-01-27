@@ -87,14 +87,14 @@ public class FilesAdapter extends BaseAdapter {
 
             if(FileOpenUtils.isImage(fileInfo.getName())){
                 Glide.with(fragment.getContext())
-                        .load(fileInfo.getUrl())
+                        .load(fileInfo.getPath())
                         .centerCrop()
                         .into(viewHolder.ivIcon);
 
             }
             if(FileOpenUtils.isVideo(fileInfo.getName())){
                 Glide.with(fragment.getContext())
-                        .load(fileInfo.getUrl())
+                        .load(fileInfo.getPath())
                         .centerCrop()
                         .into(viewHolder.ivIcon);
                 viewHolder.ivPlay.setVisibility(View.VISIBLE);
@@ -149,7 +149,7 @@ public class FilesAdapter extends BaseAdapter {
                 if(FileInfo.FileType.DIR.equals(fileInfo.getFileType())){
                     FileListFragment fileListFragment = new FileListFragment();
                     Bundle args = new Bundle();
-                    String dir = fileInfo.getPath()+"/"+fileInfo.getName();
+                    String dir = fileInfo.getDir();
                     args.putString("dir", dir);
                     fileListFragment.setArguments(args);
                     FragmentUtils.switchFragment(fragment.getActivity(),R.id.flContainer,fragment,fileListFragment,true);

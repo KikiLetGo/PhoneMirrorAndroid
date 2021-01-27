@@ -2,6 +2,8 @@ package com.elexlab.mydisk.pojo;
 
 import com.elexlab.mydisk.constants.Constants;
 
+import java.io.File;
+
 public class FileInfo extends HttpPojo{
     public interface FileType{
         String DIR = "dir";
@@ -13,10 +15,26 @@ public class FileInfo extends HttpPojo{
         int LOCAL_MIRROR = LOCAL+1;
         int LOCAL_MIRROR_RECOVERY = LOCAL_MIRROR+1;
     }
-    private String fileType;
     private String name;
-    private String path;
+    private String dir;
     private int storeLocation;
+    private String fileType;
+
+    public FileInfo(){
+
+    }
+    public FileInfo(String path){
+        File file = new File(path);
+        name = file.getName();
+        path = file.getParent()+"/";
+        if(file.isDirectory()){
+            fileType = FileType.DIR;
+        }else{
+            fileType = FileType.DOCUMENT;
+        }
+        storeLocation = StoreLocation.LOCAL;
+
+    }
 
     public String getFileType() {
         return fileType;
@@ -34,12 +52,12 @@ public class FileInfo extends HttpPojo{
         this.name = name;
     }
 
-    public String getPath() {
-        return path;
+    public String getDir() {
+        return dir;
     }
 
-    public void setPath(String path) {
-        this.path = path;
+    public void setDir(String dir) {
+        this.dir = dir;
     }
 
     public int getStoreLocation() {
@@ -50,13 +68,13 @@ public class FileInfo extends HttpPojo{
         this.storeLocation = storeLocation;
     }
 
-    public String getUrl(){
+    public String getPath(){
         if(storeLocation == StoreLocation.MIRROR){
-            String url = Constants.DOWNLOAD_FILE + path+name;
+            String url = Constants.DOWNLOAD_FILE +dir+name;
             return url;
 
         }else {
-            return Constants.Path.LOCAL_DISK_ROOT+path+name;
+            return dir+File.separator+name;
         }
     }
 
@@ -67,9 +85,7 @@ public class FileInfo extends HttpPojo{
         return FileType.DOCUMENT.equals(fileType);
     }
 
-    public String getLocalPath(){
-        return Constants.Path.LOCAL_DISK_ROOT+path;
-    }
+
 
     @Override
     public boolean equals(Object obj) {
@@ -77,7 +93,7 @@ public class FileInfo extends HttpPojo{
             return super.equals(obj);
         }
         FileInfo outter = (FileInfo) obj;
-        return (path+name).equals(outter.path+outter.name);
+        return (dir+name).equals(outter.dir+outter.name);
     }
 
 

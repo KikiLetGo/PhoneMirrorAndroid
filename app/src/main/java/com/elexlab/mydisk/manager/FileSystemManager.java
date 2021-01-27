@@ -6,9 +6,12 @@ import android.os.Environment;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import com.elexlab.mydisk.constants.Constants;
+import com.elexlab.mydisk.datasource.DataSourceCallback;
+import com.elexlab.mydisk.datasource.DiskFileLoader;
 import com.elexlab.mydisk.datasource.HeroLib;
 import com.elexlab.mydisk.model.FileDir;
 import com.elexlab.mydisk.pojo.FileInfo;
+import com.elexlab.mydisk.ui.misc.ProgressListener;
 import com.elexlab.mydisk.utils.CommonUtil;
 import com.elexlab.mydisk.utils.HeroLog;
 import com.elexlab.mydisk.utils.HttpUtils;
@@ -18,6 +21,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executors;
@@ -51,7 +55,7 @@ public class FileSystemManager {
             public void onResponse(String s) {
                 HeroLog.d(TAG,"is MirrorDisk created:"+s);
                 if(!Boolean.valueOf(s)){
-                    createMirrorDisk();
+                    createMirrorDisk(null);
                 }
 
             }
@@ -62,8 +66,69 @@ public class FileSystemManager {
             }
         });
     }
+    public void isMirrorCreated(Context context,final DataSourceCallback<Boolean> callback){
+        String deviceId = CommonUtil.getDeviceId(context);
+
+        HttpUtils.GET(Constants.HOST + "/checkMirrorDisk?device="+deviceId, new HttpUtils.HttpRequestListener() {
+            @Override
+            public void onResponse(String s) {
+                HeroLog.d(TAG,"is MirrorDisk created:"+s);
+                callback.onSuccess(Boolean.valueOf(s));
+
+
+            }
+
+            @Override
+            public void onErrorResponse(String msg) {
+
+            }
+        });
+
+    }
+
+
+    public void uploadFiles(List<FileInfo> localFileInfos,final ProgressListener<FileInfo> progressListener){
+        final Iterator<FileInfo> fileInfoIterator = localFileInfos.iterator();
+        final int allCount = localFileInfos.size();
+        if(fileInfoIterator.hasNext()){
+            FileInfo fileInfo = fileInfoIterator.next();
+
+            FileSystemManager.getInstance().uploadFile(fileInfo, new FileSystemManager.FileActionListener() {
+                private int nowCount = 0;
+                @Override
+                public void onCompletion(FileInfo uploadedFileInfo,String msg) {
+                    nowCount = nowCount+1;
+                    float progress = ((float)nowCount)/((float)allCount);
+                    if(progressListener != null){
+                        progressListener.onProgress(progress,uploadedFileInfo);
+                    }
+                    if(fileInfoIterator.hasNext()){
+                        FileInfo fileInfo = fileInfoIterator.next();
+                        FileSystemManager.getInstance().uploadFile(fileInfo,this);
+                    }else{
+                        if(progressListener != null){
+                            progressListener.onComplete();
+                        }
+                    }
+                }
+
+                @Override
+                public void onError(FileInfo fileInfo,String msg) {
+                    if(progressListener != null){
+                        progressListener.onError(0,msg);
+                    }
+                }
+            });
+
+        }else{
+            if(progressListener != null){
+                progressListener.onComplete();
+            }
+        }
+
+    }
     public void uploadFile(final FileInfo fileInfo,final FileActionListener listener){
-        File file = new File(fileInfo.getUrl());//local file absolute url
+        File file = new File(fileInfo.getPath());//local file absolute url
         String path = fileInfo.getPath()+fileInfo.getName();
 
 
@@ -113,7 +178,7 @@ public class FileSystemManager {
         });
     }
 
-    private void createMirrorDisk(){
+    public void createMirrorDisk(final DataSourceCallback dataSourceCallback){
 
         final String path = Environment.getExternalStorageDirectory().getAbsolutePath();
         final FileDir rootDir = new FileDir();
@@ -139,11 +204,12 @@ public class FileSystemManager {
                 HttpUtils.POST(Constants.HOST + "/createMirrorDisk", form, new HttpUtils.HttpRequestListener() {
                     @Override
                     public void onResponse(String s) {
-
+                        dataSourceCallback.onSuccess(s);
                     }
 
                     @Override
                     public void onErrorResponse(String msg) {
+                        dataSourceCallback.onFailure(msg,0);
 
                     }
                 });

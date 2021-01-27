@@ -147,14 +147,14 @@ public class FilesBrowserAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
             if(FileOpenUtils.isImage(fileInfo.getName())){
                 Glide.with(context)
-                        .load(fileInfo.getUrl())
+                        .load(fileInfo.getPath())
                         .centerCrop()
                         .into(viewHolder.ivIcon);
 
             }
             if(FileOpenUtils.isVideo(fileInfo.getName())){
                 Glide.with(context)
-                        .load(fileInfo.getUrl())
+                        .load(fileInfo.getPath())
                         .centerCrop()
                         .into(viewHolder.ivIcon);
                 viewHolder.ivPlay.setVisibility(View.VISIBLE);
@@ -169,7 +169,7 @@ public class FilesBrowserAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 @Override
                 public void onClick(View v) {
                     FileOpenUtils.openFile(context,
-                            Constants.Path.LOCAL_DISK_ROOT+fileInfo.getPath()+"/"+fileInfo.getName());
+                            fileInfo.getPath());
                 }
             };
         }else if(getItemViewType(position) == FileInfo.StoreLocation.MIRROR){
@@ -180,7 +180,7 @@ public class FilesBrowserAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 public void onClick(View v) {
                     mirrorViewHolder.pbRecovering.setVisibility(View.VISIBLE);
                     String url = Constants.DOWNLOAD_FILE + fileInfo.getPath()+fileInfo.getName()+"&filename="+fileInfo.getName();
-                    final String path = fileInfo.getLocalPath()+"/"+fileInfo.getName();
+                    final String path = fileInfo.getPath();
                     HeroLog.d("FilesAdapter",path);
                     HeroLog.d("url",url);
 
@@ -248,7 +248,7 @@ public class FilesBrowserAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 @Override
                 public void onClick(View v) {
                     FileOpenUtils.openFile(context,
-                            Constants.Path.LOCAL_DISK_ROOT+fileInfo.getPath()+"/"+fileInfo.getName());
+                            fileInfo.getPath());
                 }
             };
         }
@@ -259,7 +259,7 @@ public class FilesBrowserAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
                 public void onClick(View v) {
                     FileListFragment fileListFragment = new FileListFragment();
                     Bundle args = new Bundle();
-                    String dir = fileInfo.getPath()+"/"+fileInfo.getName();
+                    String dir = fileInfo.getPath();
                     args.putString("dir", dir);
                     fileListFragment.setArguments(args);
                     FragmentUtils.switchFragment(fragment.getActivity(),R.id.flContainer,fragment,fileListFragment,true);
