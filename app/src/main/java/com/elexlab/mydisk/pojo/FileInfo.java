@@ -26,7 +26,7 @@ public class FileInfo extends HttpPojo{
     public FileInfo(String path){
         File file = new File(path);
         name = file.getName();
-        path = file.getParent()+"/";
+        dir = file.getParent();
         if(file.isDirectory()){
             fileType = FileType.DIR;
         }else{
