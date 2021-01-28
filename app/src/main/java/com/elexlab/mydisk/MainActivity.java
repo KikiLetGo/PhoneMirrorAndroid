@@ -3,11 +3,15 @@ package com.elexlab.mydisk;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.View;
 import android.view.Menu;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Toast;
 
 import com.elexlab.mydisk.ui.files.FileBrowserActivity;
+import com.elexlab.mydisk.ui.gallery.PhoneGalleryDialog;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
@@ -34,8 +38,9 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                showPhoneGallery();
+//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+//                        .setAction("Action", null).show();
             }
         });
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -76,5 +81,24 @@ public class MainActivity extends AppCompatActivity {
                 finish();
             }
         }
+    }
+
+    private void showPhoneGallery(){
+        //1、初始化Dialog
+        PhoneGalleryDialog dialog=new PhoneGalleryDialog(this,R.style.DialogTheme);
+        //获取Dialogwindow对象
+        Window window=dialog.getWindow();
+        //设置弹出位置
+        window.setGravity(Gravity.BOTTOM);
+        //设置动画
+        window.setWindowAnimations(R.style.dialog_menu_animStyle);
+        //设置对话框大小
+        window.getDecorView().setPadding(0,0,0,0);
+        WindowManager.LayoutParams layoutParams=window.getAttributes();
+        //设置宽度和高度
+        layoutParams.width= WindowManager.LayoutParams.MATCH_PARENT;
+        layoutParams.height=WindowManager.LayoutParams.WRAP_CONTENT;
+        //显示Dialog
+        dialog.show();
     }
 }

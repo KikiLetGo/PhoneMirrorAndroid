@@ -209,7 +209,7 @@ public class FilesBrowserAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
         }else if(getItemViewType(position) == FileInfo.StoreLocation.LOCAL){
             final LocalViewHolder localViewHolder = (LocalViewHolder) holder;
-            localViewHolder.ivLocation.setOnClickListener(new View.OnClickListener() {
+            localViewHolder.llLocation.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(final View v) {
                     final Animation operatingAnim = AnimationUtils.loadAnimation(context, R.anim.rotate_anim);
@@ -323,9 +323,11 @@ public class FilesBrowserAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
     }
     private class LocalViewHolder extends ViewHolder{
         public ImageView ivLocation;
+        public View llLocation;
         public LocalViewHolder(@NonNull View itemView) {
             super(itemView);
             ivLocation = itemView.findViewById(R.id.ivLocation);
+            llLocation = itemView.findViewById(R.id.llLocation);
         }
     }
 

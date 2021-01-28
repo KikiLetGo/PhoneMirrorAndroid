@@ -13,6 +13,7 @@
         android:layout_height="wrap_content">
         <RelativeLayout
             android:id="@+id/rlIcon"
+            android:layout_centerVertical="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content">
             <ImageView
@@ -31,19 +32,29 @@
 
         <TextView
             android:id="@+id/tvFileName"
-            android:text="fileName"
+            android:text="fileNamefileNamefileNamefileNamefileNamefileNamefileName"
             android:layout_toRightOf="@id/rlIcon"
+            android:layout_toLeftOf="@+id/llLocation"
             android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
             android:layout_centerVertical="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
-        <ImageView
-            android:id="@+id/ivLocation"
-            android:src="@drawable/ic_sync"
+        <LinearLayout
+            android:id="@+id/llLocation"
             android:layout_alignParentRight="true"
+            android:gravity="center"
+            android:padding="5dp"
             android:layout_centerVertical="true"
-            android:layout_marginRight="10dp"
-            android:layout_width="20dp"
-            android:layout_height="20dp"/>
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent">
+            <ImageView
+                android:id="@+id/ivLocation"
+                android:src="@drawable/ic_sync"
+
+                android:layout_width="20dp"
+                android:layout_height="20dp"/>
+        </LinearLayout>
+
     </RelativeLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
