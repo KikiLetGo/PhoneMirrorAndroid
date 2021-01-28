@@ -1,21 +1,33 @@
 package com.elexlab.mydisk.manager;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.database.Cursor;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.Toast;
 
+import com.alibaba.fastjson.JSONArray;
 import com.elexlab.mydisk.MyDiskApplication;
+import com.elexlab.mydisk.R;
+import com.elexlab.mydisk.constants.Constants;
 import com.elexlab.mydisk.datasource.DiskFileLoader;
+import com.elexlab.mydisk.datasource.HeroLib;
+import com.elexlab.mydisk.pojo.Contact;
 import com.elexlab.mydisk.pojo.FileInfo;
 import com.elexlab.mydisk.ui.misc.ProgressListener;
 import com.elexlab.mydisk.ui.wiget.PercentProgressDialog;
+import com.elexlab.mydisk.utils.CommonUtil;
 import com.elexlab.mydisk.utils.HeroLog;
+import com.elexlab.mydisk.utils.HttpUtils;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MediaManager {
     private static final String TAG = MediaManager.class.getName();
@@ -56,16 +68,56 @@ public class MediaManager {
 
     }
 
-    public void backupContact(Context context){
+    public void backupContact(final Context context){
         Cursor cursor = context.getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, new String[]{ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME, ContactsContract.CommonDataKinds.Phone.NUMBER}, null, null, ContactsContract.CommonDataKinds.Phone.SORT_KEY_PRIMARY);
+        List<Contact> contacts = new ArrayList<>();
         if (cursor != null) {
             while (cursor.moveToNext()) {
-                HeroLog.d("MediaManager",cursor.getString(0));
-                HeroLog.d("MediaManager",cursor.getString(1));
+                String name = cursor.getString(0);
+                String phoneNumber = cursor.getString(1);
+                HeroLog.d("MediaManager",name);
+                HeroLog.d("MediaManager",phoneNumber);
+                contacts.add(new Contact(name,phoneNumber));
 
             }
             cursor.close();
         }
+        String contactsJson = JSONArray.toJSONString(contacts);
+        Map<String,String> form = new HashMap<>();
+        form.put("contacts",contactsJson);
+        form.put("device", CommonUtil.getDeviceId(HeroLib.getInstance().appContext));
+
+
+        View view = LayoutInflater.from(context).inflate(R.layout.view_loading,null);
+        final AlertDialog dialog = new AlertDialog.Builder(context)
+                .setView(view)
+                .create();
+        dialog.show();
+        HttpUtils.POST(Constants.HOST + "/uploadContacts", form, new HttpUtils.HttpRequestListener() {
+            @Override
+            public void onResponse(String s) {
+                MyDiskApplication.getMainHandler().post(new Runnable() {
+                    @Override
+                    public void run() {
+                        dialog.dismiss();
+                        Toast.makeText(context,"上传成功～",Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
+
+            @Override
+            public void onErrorResponse(final String msg) {
+                MyDiskApplication.getMainHandler().post(new Runnable() {
+                    @Override
+                    public void run() {
+                        dialog.dismiss();
+                        Toast.makeText(context,"上传发生错误:"+msg,Toast.LENGTH_LONG).show();
+                    }
+                });
+
+            }
+        });
+
     }
 
     private void backUpFiles(final Context context,List<FileInfo> fileInfos){

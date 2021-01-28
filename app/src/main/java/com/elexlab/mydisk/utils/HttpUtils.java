@@ -56,6 +56,9 @@ public class HttpUtils {
                     @Override
                     public void onResponse(String response) {
                         HeroLog.d(TAG, response);
+                        if(httpRequestListener != null){
+                            httpRequestListener.onResponse(response);
+                        }
 
                     }
                 }, new Response.ErrorListener() {
@@ -64,6 +67,9 @@ public class HttpUtils {
                 //requestTags.remove(requestTag);
                 Toast.makeText(HeroLib.getInstance().appContext,"网络错误",Toast.LENGTH_SHORT).show();
                 HeroLog.e(TAG, error.getMessage());
+                if(httpRequestListener != null){
+                    httpRequestListener.onErrorResponse(error.getMessage());
+                }
 
             }
         }){
