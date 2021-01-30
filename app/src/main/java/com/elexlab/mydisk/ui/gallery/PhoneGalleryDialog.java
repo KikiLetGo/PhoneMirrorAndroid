@@ -17,6 +17,7 @@ import com.elexlab.mydisk.MyDiskApplication;
 import com.elexlab.mydisk.R;
 import com.elexlab.mydisk.datasource.DataSourceCallback;
 import com.elexlab.mydisk.manager.PhoneManager;
+import com.elexlab.mydisk.ui.files.FileBrowserActivity;
 
 import java.util.List;
 
@@ -63,12 +64,18 @@ public class PhoneGalleryDialog extends Dialog {
     private void showPhones(List<String> phones){
         LayoutInflater mInflater = LayoutInflater.from(getContext());
         LinearLayout llPhones = findViewById(R.id.llPhones);
-        for(String phone:phones){
+        for(final String phone:phones){
             View view = mInflater.inflate(R.layout.item_phone,
                     llPhones, false);
             TextView tvName = view.findViewById(R.id.tvName);
             tvName.setText(phone);
             llPhones.addView(view);
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    FileBrowserActivity.startActivity(getContext(),phone);
+                }
+            });
         }
 
 

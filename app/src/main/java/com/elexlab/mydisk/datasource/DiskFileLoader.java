@@ -6,6 +6,7 @@ import com.elexlab.mydisk.constants.Constants;
 import com.elexlab.mydisk.manager.FileSystemManager;
 import com.elexlab.mydisk.pojo.FileInfo;
 import com.elexlab.mydisk.ui.misc.ProgressListener;
+import com.elexlab.mydisk.utils.CommonUtil;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -16,16 +17,23 @@ import java.util.Iterator;
 import java.util.List;
 
 public class DiskFileLoader {
+    private String device = CommonUtil.getDeviceId(HeroLib.getInstance().appContext);
     private List<FileInfo> localCaches;
     private List<FileInfo> mirrorCaches;
     private List<FileInfo> mergedCaches;
     private String dir;
+
 
     public interface Callback{
         void onLoaded(List<FileInfo> merged,List<FileInfo> locals,List<FileInfo> mirrors);
     }
     public DiskFileLoader(String dir) {
         this.dir = dir;
+    }
+
+    public DiskFileLoader(String dir,String device) {
+        this.dir = dir;
+        this.device = device;
     }
 
     public void loadFiles(final String dir, final Callback callback){
@@ -184,7 +192,8 @@ public class DiskFileLoader {
             return;
         }
         FileInfoDataSource fileInfoDataSource = new FileInfoDataSource();
-        fileInfoDataSource.setUrl(Constants.LIST_DIR_BASE + dir);
+        String url = String.format(Constants.LIST_DIR_BASE,device,dir);
+        fileInfoDataSource.setUrl(url);
         DataCondition dataCondition = new DataCondition();
         fileInfoDataSource.getDatas(new DataSourceCallback<List<FileInfo>>() {
             @Override

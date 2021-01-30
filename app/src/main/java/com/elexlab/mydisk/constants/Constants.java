@@ -7,7 +7,7 @@ import com.elexlab.mydisk.utils.CommonUtil;
 
 public interface Constants {
     String HOST = "http://192.168.3.22:8888";
-    String LIST_DIR_BASE = HOST+"/listDir?device="+CommonUtil.getDeviceId(HeroLib.getInstance().appContext)+"&dir=";
+    String LIST_DIR_BASE = HOST+"/listDir?device=%1$s&dir=%2$s";
     String DOWNLOAD_FILE = HOST+"/download?device="+CommonUtil.getDeviceId(HeroLib.getInstance().appContext)+"&dir=";
     String UPLOAD_FILE = HOST+"/upload?device="+CommonUtil.getDeviceId(HeroLib.getInstance().appContext);
 

@@ -42,19 +42,19 @@ public class FilesBrowserAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
 
     //private DistAlbums distAlbums;
     private Context context;
-    private Fragment fragment;
+    private FileListFragment fragment;
 
     private Handler handler = new Handler();
 
     private List<FileInfo> fileInfos;
     private List<RecyclerItemData<FileInfo>> recyclerItems;
 
-    public FilesBrowserAdapter (Fragment fragment) {
+    public FilesBrowserAdapter (FileListFragment fragment) {
         //this.distAlbums = distAlbums;
         this.fragment = fragment;
         this.context = fragment.getContext();
     }
-    public FilesBrowserAdapter (Fragment fragment,List<FileInfo> fileInfos) {
+    public FilesBrowserAdapter (FileListFragment fragment,List<FileInfo> fileInfos) {
         //this.distAlbums = distAlbums;
         this.fragment = fragment;
         this.context = fragment.getContext();
@@ -257,7 +257,7 @@ public class FilesBrowserAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             onClickListener = new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    FileListFragment fileListFragment = new FileListFragment();
+                    FileListFragment fileListFragment = new FileListFragment(fragment.getDevice());
                     Bundle args = new Bundle();
                     String dir = fileInfo.getPath();
                     args.putString("dir", dir);

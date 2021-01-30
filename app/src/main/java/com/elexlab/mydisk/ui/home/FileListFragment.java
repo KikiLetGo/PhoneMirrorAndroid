@@ -37,7 +37,19 @@ public class FileListFragment  extends Fragment {
         int NO_MIRROR = 0;
         int WITH_MIRROR = 1;
     }
+    public FileListFragment(){
 
+    }
+    public FileListFragment(String device){
+        this.device = device;
+
+    }
+
+    public String getDevice() {
+        return device;
+    }
+
+    private String device;
     private int viewMode = ShowMode.NO_MIRROR;
     private HomeViewModel homeViewModel;
     private String dir = Constants.Path.LOCAL_DISK_ROOT;
@@ -70,7 +82,7 @@ public class FileListFragment  extends Fragment {
                 dir = currentDir;
             }
         }
-        diskFileLoader = new DiskFileLoader(dir);
+        diskFileLoader = new DiskFileLoader(dir,device);
         filesBrowserAdapter = new FilesBrowserAdapter(this);
         rcvFiles.setAdapter(filesBrowserAdapter);
         loadFiles();
