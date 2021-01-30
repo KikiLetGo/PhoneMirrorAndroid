@@ -13,7 +13,12 @@ import android.widget.RadioButton;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 
+import com.elexlab.mydisk.MyDiskApplication;
 import com.elexlab.mydisk.R;
+import com.elexlab.mydisk.datasource.DataSourceCallback;
+import com.elexlab.mydisk.manager.PhoneManager;
+
+import java.util.List;
 
 
 public class PhoneGalleryDialog extends Dialog {
@@ -35,13 +40,38 @@ public class PhoneGalleryDialog extends Dialog {
         super.onCreate(savedInstanceState);
         //设置布局
         setContentView(R.layout.phone_gallery_dialog);
-        LinearLayout llPhones = findViewById(R.id.llPhones);
+
+        PhoneManager.getInstance().listPhones(new DataSourceCallback<List<String>>() {
+            @Override
+            public void onSuccess(final List<String> strings, String... extraParams) {
+                MyDiskApplication.getMainHandler().post(new Runnable() {
+                    @Override
+                    public void run() {
+                        showPhones(strings);
+                    }
+                });
+            }
+
+            @Override
+            public void onFailure(String errMsg, int code) {
+
+            }
+        });
+
+    }
+
+    private void showPhones(List<String> phones){
         LayoutInflater mInflater = LayoutInflater.from(getContext());
-        for(int i=0;i<10;i++){
+        LinearLayout llPhones = findViewById(R.id.llPhones);
+        for(String phone:phones){
             View view = mInflater.inflate(R.layout.item_phone,
                     llPhones, false);
+            TextView tvName = view.findViewById(R.id.tvName);
+            tvName.setText(phone);
             llPhones.addView(view);
         }
+
+
     }
 }
 

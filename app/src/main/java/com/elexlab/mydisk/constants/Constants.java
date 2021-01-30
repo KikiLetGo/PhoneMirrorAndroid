@@ -11,9 +11,11 @@ public interface Constants {
     String DOWNLOAD_FILE = HOST+"/download?device="+CommonUtil.getDeviceId(HeroLib.getInstance().appContext)+"&dir=";
     String UPLOAD_FILE = HOST+"/upload?device="+CommonUtil.getDeviceId(HeroLib.getInstance().appContext);
 
+    String LIST_PHONES = HOST+"/listPhones?device="+CommonUtil.getDeviceId(HeroLib.getInstance().appContext);
+
+
     interface Path{
         String LOCAL_DISK_ROOT = Environment.getExternalStorageDirectory().getAbsolutePath();
-
     }
 
 }
