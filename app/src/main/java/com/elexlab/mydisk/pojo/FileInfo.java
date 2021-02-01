@@ -75,7 +75,7 @@ public class FileInfo extends HttpPojo{
     }
 
     public String getUrl(){
-        String url = Constants.DOWNLOAD_FILE +getDir()+"/&filename="+name;
+        String url = Constants.getDownloadFileUrl()+getDir()+"/&filename="+name;;
         return url;
 
     }

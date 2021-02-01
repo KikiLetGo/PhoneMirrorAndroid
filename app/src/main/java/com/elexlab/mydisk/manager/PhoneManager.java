@@ -1,8 +1,12 @@
 package com.elexlab.mydisk.manager;
 
 import com.alibaba.fastjson.JSONArray;
+import com.elexlab.mydisk.MyDiskApplication;
 import com.elexlab.mydisk.constants.Constants;
 import com.elexlab.mydisk.datasource.DataSourceCallback;
+import com.elexlab.mydisk.datasource.HeroLib;
+import com.elexlab.mydisk.utils.CommonUtil;
+import com.elexlab.mydisk.utils.HeroLog;
 import com.elexlab.mydisk.utils.HttpUtils;
 
 import java.util.List;
@@ -12,6 +16,7 @@ public class PhoneManager {
     public static PhoneManager getInstance(){
         return instance;
     }
+    private String device = CommonUtil.getDeviceId(HeroLib.getInstance().appContext);
     public void listPhones(final DataSourceCallback<List<String>> dataSourceCallback){
         HttpUtils.GET(Constants.LIST_PHONES, new HttpUtils.HttpRequestListener() {
             @Override
@@ -31,4 +36,23 @@ public class PhoneManager {
         });
     }
 
+    public boolean isCurrentDevice(String device){
+        return CommonUtil.getDeviceId(HeroLib.getInstance().appContext).equals(device);
+    }
+
+    public boolean isCurrentDevice(){
+        return CommonUtil.getDeviceId(HeroLib.getInstance().appContext).equals(device);
+    }
+
+    public void setDevice(String currentDevice) {
+        this.device = currentDevice;
+    }
+
+    public String getDevice() {
+        return device;
+    }
+
+    public void set2CurrentDevice(String currentDevice) {
+        this.device = currentDevice;
+    }
 }

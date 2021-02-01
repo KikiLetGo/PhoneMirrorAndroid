@@ -24,7 +24,7 @@
                 android:id="@+id/ivPlay"
                 android:visibility="gone"
                 android:layout_centerInParent="true"
-                android:src="@drawable/ic_play"
+                android:src="@mipmap/folder"
                 android:layout_width="30dp"
                 android:layout_height="30dp"/>
             <ProgressBar

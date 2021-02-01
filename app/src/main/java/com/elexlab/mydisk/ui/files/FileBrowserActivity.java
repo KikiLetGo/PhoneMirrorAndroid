@@ -12,6 +12,7 @@ import androidx.fragment.app.FragmentActivity;
 
 import com.elexlab.mydisk.R;
 import com.elexlab.mydisk.datasource.HeroLib;
+import com.elexlab.mydisk.manager.PhoneManager;
 import com.elexlab.mydisk.ui.home.FileListFragment;
 import com.elexlab.mydisk.utils.CommonUtil;
 import com.elexlab.mydisk.utils.FragmentUtils;
@@ -19,12 +20,15 @@ import com.elexlab.mydisk.utils.HeroLog;
 
 public class FileBrowserActivity extends FragmentActivity {
     public static void startActivity(Context context){
+        PhoneManager.getInstance().setDevice(CommonUtil.getDeviceId(HeroLib.getInstance().appContext));
+
         Intent intent = new Intent(context,FileBrowserActivity.class);
         context.startActivity(intent);
     }
     public static void startActivity(Context context,String device){
         Intent intent = new Intent(context,FileBrowserActivity.class);
         intent.putExtra("device",device);
+        PhoneManager.getInstance().setDevice(device);
         context.startActivity(intent);
     }
     @Override

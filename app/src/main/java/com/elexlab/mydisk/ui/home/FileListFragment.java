@@ -24,6 +24,7 @@ import com.elexlab.mydisk.R;
 import com.elexlab.mydisk.constants.Constants;
 import com.elexlab.mydisk.datasource.DataSourceCallback;
 import com.elexlab.mydisk.datasource.DiskFileLoader;
+import com.elexlab.mydisk.manager.PhoneManager;
 import com.elexlab.mydisk.pojo.FileInfo;
 import com.elexlab.mydisk.ui.files.FilesBrowserAdapter;
 import com.elexlab.mydisk.ui.misc.ProgressListener;
@@ -135,6 +136,11 @@ public class FileListFragment  extends Fragment {
                 });
             }
         });
+        if(!PhoneManager.getInstance().isCurrentDevice(device)){
+            ivMode.setVisibility(View.GONE);
+            llSyncALl.setVisibility(View.GONE);
+            viewMode = ShowMode.WITH_MIRROR;
+        }
         return root;
     }
     public void switchModel(){

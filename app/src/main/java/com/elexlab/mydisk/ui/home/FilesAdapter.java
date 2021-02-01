@@ -161,7 +161,7 @@ public class FilesAdapter extends BaseAdapter {
                                 Constants.Path.LOCAL_DISK_ROOT+fileInfo.getPath()+"/"+fileInfo.getName());
 
                     }else{
-                        String url = Constants.DOWNLOAD_FILE + fileInfo.getPath()+fileInfo.getName()+"&filename="+fileInfo.getName();
+                        String url = Constants.getDownloadFileUrl() + fileInfo.getPath()+fileInfo.getName()+"&filename="+fileInfo.getName();
                         final String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/"+fileInfo.getName();
                         HeroLog.d("FilesAdapter",path);
                         HeroLog.d("url",url);

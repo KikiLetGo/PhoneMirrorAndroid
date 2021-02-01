@@ -4,6 +4,7 @@ import android.util.ArraySet;
 
 import com.elexlab.mydisk.constants.Constants;
 import com.elexlab.mydisk.manager.FileSystemManager;
+import com.elexlab.mydisk.manager.PhoneManager;
 import com.elexlab.mydisk.pojo.FileInfo;
 import com.elexlab.mydisk.ui.misc.ProgressListener;
 import com.elexlab.mydisk.utils.CommonUtil;
@@ -50,30 +51,51 @@ public class DiskFileLoader {
             }
             return;
         }
-        loadLocalFiles(new DataSourceCallback<List<FileInfo>>() {
-            @Override
-            public void onSuccess(final List<FileInfo> localFileInfos, String... extraParams) {
-                loadMirrorFiles(new DataSourceCallback<List<FileInfo>>() {
-                    @Override
-                    public void onSuccess(List<FileInfo> fileInfos, String... extraParams) {
-                        mergeLocalAndMirrorFile(localFileInfos,fileInfos);
-                        if(callback != null){
-                            callback.onLoaded(mergedCaches,localCaches,mirrorCaches);
+        if(! PhoneManager.getInstance().isCurrentDevice(device)){
+            loadMirrorFiles(new DataSourceCallback<List<FileInfo>>() {
+                @Override
+                public void onSuccess(List<FileInfo> fileInfos, String... extraParams) {
+                    mergedCaches = fileInfos;
+                    mirrorCaches = fileInfos;
+                    if(callback != null){
+                        callback.onLoaded(mergedCaches,localCaches,mirrorCaches);
+                    }
+                }
+
+                @Override
+                public void onFailure(String errMsg, int code) {
+
+                }
+            });
+            return;
+
+        }else {
+            loadLocalFiles(new DataSourceCallback<List<FileInfo>>() {
+                @Override
+                public void onSuccess(final List<FileInfo> localFileInfos, String... extraParams) {
+                    loadMirrorFiles(new DataSourceCallback<List<FileInfo>>() {
+                        @Override
+                        public void onSuccess(List<FileInfo> fileInfos, String... extraParams) {
+                            mergeLocalAndMirrorFile(localFileInfos, fileInfos);
+                            if (callback != null) {
+                                callback.onLoaded(mergedCaches, localCaches, mirrorCaches);
+                            }
                         }
-                    }
 
-                    @Override
-                    public void onFailure(String errMsg, int code) {
+                        @Override
+                        public void onFailure(String errMsg, int code) {
 
-                    }
-                });
-            }
+                        }
+                    });
+                }
 
-            @Override
-            public void onFailure(String errMsg, int code) {
+                @Override
+                public void onFailure(String errMsg, int code) {
 
-            }
-        });
+                }
+
+            });
+        }
 
     }
     private List<FileInfo> mergeLocalAndMirrorFile(List<FileInfo> localFileInfos,List<FileInfo> mirrorFileInfos){
@@ -187,7 +209,7 @@ public class DiskFileLoader {
     private void loadMirrorFiles(final DataSourceCallback<List<FileInfo>> callback){
         if(mirrorCaches != null){
             if(callback != null){
-                callback.onSuccess(localCaches);
+                callback.onSuccess(mirrorCaches);
             }
             return;
         }

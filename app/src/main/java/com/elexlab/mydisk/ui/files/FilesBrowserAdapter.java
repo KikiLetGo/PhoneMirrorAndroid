@@ -141,20 +141,24 @@ public class FilesBrowserAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
         viewHolder.tvFileName.setText(fileInfo.getName());
         View.OnClickListener onClickListener = null;
         if("dir".equals(fileInfo.getFileType())){
-            viewHolder.ivIcon.setImageResource(R.drawable.ic_folder);
+            viewHolder.ivIcon.setImageResource(R.mipmap.folder);
         }else {
             viewHolder.ivIcon.setImageResource(R.drawable.ic_file);
 
+            String filePath = fileInfo.getPath();
+            if(fileInfo.getStoreLocation() == FileInfo.StoreLocation.MIRROR){
+                filePath = fileInfo.getUrl();
+            }
             if(FileOpenUtils.isImage(fileInfo.getName())){
                 Glide.with(context)
-                        .load(fileInfo.getPath())
+                        .load(filePath)
                         .centerCrop()
                         .into(viewHolder.ivIcon);
 
             }
             if(FileOpenUtils.isVideo(fileInfo.getName())){
                 Glide.with(context)
-                        .load(fileInfo.getPath())
+                        .load(filePath)
                         .centerCrop()
                         .into(viewHolder.ivIcon);
                 viewHolder.ivPlay.setVisibility(View.VISIBLE);
@@ -174,6 +178,8 @@ public class FilesBrowserAdapter extends RecyclerView.Adapter<RecyclerView.ViewH
             };
         }else if(getItemViewType(position) == FileInfo.StoreLocation.MIRROR){
             final MirrorViewHolder mirrorViewHolder = (MirrorViewHolder) holder;
+            ColorMatrix cm = new ColorMatrix();
+
 
             onClickListener = new View.OnClickListener() {
                 @Override

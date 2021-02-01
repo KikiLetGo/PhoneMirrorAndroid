@@ -18,7 +18,7 @@
             android:layout_height="wrap_content">
             <ImageView
                 android:id="@+id/ivIcon"
-                android:src="@drawable/ic_folder"
+                android:src="@mipmap/folder"
                 android:layout_width="80dp"
                 android:layout_height="80dp"/>
             <ImageView
